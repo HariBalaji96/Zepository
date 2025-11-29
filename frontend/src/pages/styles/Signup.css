@@ -1,0 +1,82 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
+
+* {
+  font-family: "Inter", sans-serif;
+}
+
+.container {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-div h2 {
+  font-size: 24px;
+  font-weight: 700;
+  padding-bottom: 20px;
+}
+
+.card-div {
+  position: relative;
+  width: 30%;
+  height: 80%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  box-shadow: 0 0px 20px 0px #00000060;
+}
+
+.form-div {
+  display: flex;
+  width: 80%;
+  height: 80%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.form-div form {
+  display: flex;
+  width: 100%;
+  height: 90%;
+  flex-direction: column;
+  justify-content: space-around;
+}
+.form-div h2 {
+  padding-bottom: 10px;
+}
+
+.form-div form input {
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #e0e0e0;
+  outline: none;
+}
+
+.form-div form select {
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #e0e0e0;
+  outline: none;
+}
+
+.form-div form input:focus {
+  outline: solid #e0e0e0;
+}
+
+.form-div form select:focus {
+  outline: solid #e0e0e0;
+}
+
+.form-div form button {
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  background-color: #000000;
+  color: #ffffff;
+  cursor: pointer;
+}
