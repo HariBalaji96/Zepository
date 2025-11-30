@@ -3,6 +3,7 @@ const cors = require("cors");
 
 // Authentication Router
 const authRoutes = require("./routes/auth");
+const assetRoutes = require("./routes/assets");
 
 const app = express();
 const PORT = 5000;
@@ -11,6 +12,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api/auth", authRoutes);
+app.use("/api/assets", assetRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on ${PORT}`);

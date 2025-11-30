@@ -1,0 +1,292 @@
+.assetsWrapperOuter {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Reuse header and footer styles from dashboard */
+
+.addButton {
+  background-color: black;
+  color: white;
+  text-decoration: none;
+  display: block;
+  padding: 6px 12px;
+  text-align: center;
+  width: 10%;
+  border-radius: 10px;
+  border: 1px solid black;
+}
+.addButton:hover {
+  background-color: white;
+  color: black;
+  transition: 0.5s;
+}
+
+/* MAIN CONTENT AUTO-RESIZE */
+.contentWrapper {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 30px;
+}
+
+.assetPageTitle {
+  padding-bottom: 20px;
+}
+/* Search Bar */
+.search {
+  width: 100%;
+  max-width: 400px;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #dcdcdc;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+/* List Container */
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+/* Single Row Design */
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 15px 20px;
+  background: white;
+  border-radius: 10px;
+  border: 1px solid #e5e5e5;
+  cursor: pointer;
+  transition: 0.2s;
+  box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.row:hover {
+  background-color: #f7f7f7;
+  transform: translateX(3px);
+}
+
+/* Left Panel */
+.left {
+  flex: 1;
+}
+
+.assetName {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.meta {
+  margin: 3px 0 0;
+  font-size: 14px;
+  color: #555;
+}
+
+/* Right Panel */
+.right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* Type Tag */
+.typeTag {
+  padding: 6px 12px;
+  background: #e5e5e5;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Status Tag */
+.statusTag {
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: white;
+  text-transform: capitalize;
+}
+
+/* ===============================
+   PAGE CONTAINER
+==================================*/
+.detailsPageWrapper {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===============================
+   INNER CONTENT WRAPPER
+==================================*/
+.detailsContent {
+  flex: 1;
+  padding: 30px;
+  overflow-y: auto;
+  width: 90%;
+  margin: 0 auto;
+}
+
+/* ===============================
+   PAGE TITLE
+==================================*/
+.pageTitle {
+  font-size: 32px;
+  font-weight: 600;
+  margin: 20px 0 30px;
+}
+
+/* ===============================
+   BUTTONS
+==================================*/
+.buttonDiv {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 10px;
+}
+
+/* Back Button */
+.backButton {
+  background-color: #f7f7f7;
+  border: 1px solid #dcdcdc;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.backButton:hover {
+  background-color: black;
+  color: white;
+  transition: 0.3s;
+}
+
+/* ===============================
+   SPLIT LAYOUT (LEFT + RIGHT)
+==================================*/
+.splitContainer {
+  display: flex;
+  gap: 40px;
+  width: 100%;
+}
+
+.block {
+  flex: 1;
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+}
+
+/* ===============================
+   BLOCK TITLE + EDIT BUTTON
+==================================*/
+.blockHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.blockTitle {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 10px 0 15px;
+}
+
+/* Edit Button */
+.editButton {
+  background-color: #f7f7f7;
+  border: 1px solid #dcdcdc;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.editButton:hover {
+  background-color: black;
+  color: white;
+  transition: 0.3s;
+}
+
+/* ===============================
+   TEXT ROWS INSIDE BLOCKS
+==================================*/
+.block p {
+  margin: 10px 0;
+  font-size: 16px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.block p strong {
+  width: 40%;
+  font-weight: 600;
+  color: #333;
+}
+
+.block p span {
+  width: 100px;
+  text-align: center;
+}
+
+/* ===============================
+   STATUS BADGES
+==================================*/
+.status {
+  padding: 4px 10px;
+  border-radius: 6px;
+  color: white;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+/* Status Colors */
+.working {
+  background-color: #0f6a0f;
+}
+
+.defective {
+  background-color: #b30000;
+}
+
+.under_service {
+  background-color: #856404;
+}
+
+/* ===============================
+   RESPONSIVE (Phones, small tabs)
+==================================*/
+@media (max-width: 900px) {
+  .splitContainer {
+    flex-direction: column;
+  }
+
+  .block p {
+    flex-direction: column;
+    text-align: left;
+  }
+
+  .block p strong,
+  .block p span {
+    width: 100%;
+    text-align: left;
+  }
+
+  .blockHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .editButton {
+    margin-top: 5px;
+  }
+}
