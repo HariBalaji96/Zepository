@@ -1,7 +1,7 @@
 import { useState } from "react";
 import api from "../services/api";
 import { useNavigate, Link } from "react-router-dom";
-import "./styles/Login.css";
+import styles from "./public/Login.module.css";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -34,27 +34,37 @@ export default function Login() {
   };
 
   return (
-    <div className="container">
-      <div className="card-div">
+    <div className={styles.container}>
+      <div className={styles.cardDiv}>
         <div>
-          <h1>Zepository</h1>
+          <h1 className={styles.title}>Zepository</h1>
         </div>
-        <div className="form-div">
-          <h2>SIGN IN</h2>
 
-          {error && <p style={{ color: "red" }}>{error}</p>}
+        <div className={styles.formDiv}>
+          <h2 className={styles.subtitle}>SIGN IN</h2>
 
-          <form onSubmit={handleSubmit}>
-            <input name="email" placeholder="Email" onChange={handleChange} />
+          {error && <p className={styles.error}>{error}</p>}
+
+          <form onSubmit={handleSubmit} className={styles.form}>
+            <input
+              name="email"
+              placeholder="Email"
+              onChange={handleChange}
+              className={styles.input}
+            />
+
             <input
               name="password"
               type="password"
               placeholder="Password"
               onChange={handleChange}
+              className={styles.input}
             />
-            <button>Login</button>
+
+            <button className={styles.button}>Login</button>
           </form>
-          <div>
+
+          <div className={styles.signupLink}>
             <p>
               <Link to="/signup">Click here</Link> to create new account
             </p>

@@ -12,13 +12,13 @@
   justify-content: center;
 }
 
-.card-div h2 {
+.title {
   font-size: 24px;
   font-weight: 700;
   padding-bottom: 20px;
 }
 
-.card-div {
+.cardDiv {
   position: relative;
   width: 30%;
   height: 80%;
@@ -30,7 +30,7 @@
   box-shadow: 0 0px 20px 0px #00000060;
 }
 
-.form-div {
+.formDiv {
   display: flex;
   width: 80%;
   height: 80%;
@@ -39,40 +39,44 @@
   justify-content: center;
 }
 
-.form-div form {
+.formDiv form {
   display: flex;
   width: 100%;
   height: 90%;
   flex-direction: column;
   justify-content: space-around;
 }
-.form-div h2 {
+.formDiv h2 {
   padding-bottom: 10px;
 }
 
-.form-div form input {
+.formDiv form input {
   padding: 10px;
   border-radius: 10px;
   border: 1px solid #e0e0e0;
   outline: none;
 }
 
-.form-div form select {
+.error {
+  color: red;
+}
+
+.formDiv form select {
   padding: 10px;
   border-radius: 10px;
   border: 1px solid #e0e0e0;
   outline: none;
 }
 
-.form-div form input:focus {
+.formDiv form input:focus {
   outline: solid #e0e0e0;
 }
 
-.form-div form select:focus {
+.select:focus {
   outline: solid #e0e0e0;
 }
 
-.form-div form button {
+.formDiv form button {
   padding: 10px;
   border-radius: 10px;
   border: none;
