@@ -1,0 +1,144 @@
+.pageWrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.contentWrapper {
+  width: 90%;
+  margin: 0 auto;
+  padding: 20px 0 80px;
+  flex: 1;
+}
+
+.backButton {
+  background: #f7f7f7;
+  border: 1px solid #dcdcdc;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: 12px;
+}
+
+.pageTitle {
+  font-size: 26px;
+  margin: 10px 0 20px;
+}
+
+.splitContainer {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 20px;
+}
+
+.block {
+  flex: 1;
+  background: #fff;
+  padding: 18px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.06);
+}
+
+.blockFull {
+  background: #fff;
+  padding: 18px;
+  border-radius: 10px;
+  margin-top: 18px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.06);
+}
+
+.blockHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.blockTitle {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+label {
+  display: block;
+  margin-top: 10px;
+  font-weight: 500;
+}
+input,
+select {
+  width: 100%;
+  padding: 8px 10px;
+  margin-top: 6px;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+}
+
+.saveButton {
+  background: black;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.addSpecBtn {
+  background: #1f1f1f;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  margin-right: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.specRow {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  align-items: center;
+}
+.specRow input {
+  flex: 1;
+}
+.removeBtn {
+  background: #ffdddd;
+  color: #900;
+  border: 1px solid #cc0000;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.blockFullRow {
+  display: flex;
+  gap: 16px;
+  margin-top: 18px;
+}
+.blockSmall {
+  flex: 1;
+  background: #fff;
+  padding: 16px;
+  border-radius: 10px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+}
+
+.hint {
+  font-size: 12px;
+  color: #666;
+  margin-top: 8px;
+}
+
+/* responsive */
+@media (max-width: 900px) {
+  .splitContainer {
+    flex-direction: column;
+  }
+  .blockFullRow {
+    flex-direction: column;
+  }
+  .specRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

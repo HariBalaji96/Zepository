@@ -18,7 +18,9 @@
   margin-bottom: 25px;
 }
 
-/* TWO-COLUMN FORM */
+/********************************
+  SPLIT FORM LAYOUT
+*********************************/
 .splitContainer {
   display: flex;
   gap: 40px;
@@ -38,7 +40,9 @@
   font-weight: 600;
 }
 
-/* Input Fields */
+/********************************
+  INPUTS
+*********************************/
 label {
   display: block;
   margin-top: 12px;
@@ -54,20 +58,27 @@ select {
   border-radius: 8px;
 }
 
-/* Ledger Section */
+/********************************
+  LEDGER SECTION
+*********************************/
 .ledgerCheck,
-.warrantyCheck {
-  align-items: center;
+.warrantyCheck,
+.specCheck {
   margin-top: 20px;
-  gap: 10px;
-}
-.checkInput {
-  display: inline;
+  display: flex;
+  align-items: center;
   width: fit-content;
-  margin-right: 10px;
 }
+
+.checkInput {
+  width: fit-content;
+  margin-bottom: 5px;
+  margin-right: 5px;
+}
+
 .ledgerBox,
-.warrantyBox {
+.warrantyBox,
+.specBox {
   padding: 15px;
   background: #fafafa;
   border-radius: 10px;
@@ -75,7 +86,51 @@ select {
   margin-top: 15px;
 }
 
-/* Submit Button */
+/********************************
+  SPECIFICATION ROWS
+*********************************/
+.specRow {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+  align-items: center;
+}
+
+.specRow input {
+  flex: 1;
+}
+
+.addSpecButton {
+  margin-top: 10px;
+  padding: 8px 12px;
+  background: black;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.addSpecButton:hover {
+  background: #333;
+}
+
+.removeButton {
+  padding: 8px 12px;
+  background: #ffdddd;
+  color: #900;
+  border: 1px solid #cc0000;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.removeButton:hover {
+  background: #cc0000;
+  color: white;
+}
+
+/********************************
+  SUBMIT BUTTON
+*********************************/
 .submitButton {
   margin-top: 30px;
   padding: 12px 20px;
@@ -91,7 +146,9 @@ select {
   background: #333;
 }
 
-/* Responsive */
+/********************************
+  MOBILE RESPONSIVE
+*********************************/
 @media (max-width: 900px) {
   .splitContainer {
     flex-direction: column;

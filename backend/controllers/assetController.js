@@ -57,55 +57,60 @@ exports.getAssetById = async (req, res) => {
   try {
     const id = req.params.id;
 
+    // ==============================
+    // 1) MAIN ASSET DETAILS
+    // ==============================
     const [rows] = await db.query(
       `
       SELECT 
-    ad.asset_id,
-    ad.serial_no,
-    at.type_name,
-    ad.brand,
-    ad.model,
-    ad.working_status,
-    
-    lab.lab_name,
-    
-    ad.purchase_date,
-    ad.funding_agency,  
-    ad.price,
-    ad.updated_at,
-    
-    ud.user_name,
-    
-    wd.warranty_id,
-    wd.warranty_startdate,
-    wd.warranty_enddate,
-    wd.vendor_name,
-    wd.vendor_contact,
-    
-    ledger.ledger_id,
-    ledger.page_no, 
-    ledger.serial_no AS ledger_serial_no
+        ad.asset_id,
+        ad.serial_no,
+        ad.asset_type_id,
+        at.type_name,
+        ad.brand,
+        ad.model,
+        ad.working_status,
+        
+        lab.lab_name,
+        
+        ad.purchase_date,
+        ad.funding_agency,  
+        ad.price,
+        ad.updated_at,
+        
+        ud.user_name,
+        
+        wd.warranty_id,
+        wd.warranty_startdate,
+        wd.warranty_enddate,
+        wd.vendor_name,
+        wd.vendor_contact,
+        
+        ledger.ledger_id,
+        ledger.page_no, 
+        ledger.serial_no AS ledger_serial_no
 
-    FROM asset_details ad
+      FROM asset_details ad
 
-    LEFT JOIN asset_types at 
-    ON ad.asset_type_id = at.type_id
+      LEFT JOIN asset_types at 
+        ON ad.asset_type_id = at.type_id
 
-    LEFT JOIN lab_details lab 
-    ON ad.lab_id = lab.lab_id
+      LEFT JOIN lab_details lab 
+        ON ad.lab_id = lab.lab_id
 
-    LEFT JOIN warranty_details wd 
-    ON ad.asset_id = wd.asset_id 
+      LEFT JOIN warranty_details wd 
+        ON ad.asset_id = wd.asset_id 
 
-    LEFT JOIN user_details ud 
-    ON ud.user_id = ad.created_by
+      LEFT JOIN user_details ud 
+        ON ud.user_id = ad.created_by
 
-    LEFT JOIN ledger_details ledger 
-    ON ad.asset_id = ledger.asset_id
+      LEFT JOIN ledger_details ledger 
+        ON ad.asset_id = ledger.asset_id
 
-    WHERE ad.asset_id = ?
-    AND COALESCE(ad.is_deleted, 0) != 1 LIMIT 1;
-    `,
+      WHERE ad.asset_id = ?
+        AND COALESCE(ad.is_deleted, 0) != 1
+      LIMIT 1;
+      `,
       [id]
     );
 
@@ -113,9 +118,335 @@ exports.getAssetById = async (req, res) => {
       return res.status(404).json({ message: "Asset not found" });
     }
 
-    return res.json({ asset: rows[0] });
+    const asset = rows[0];
+
+    // ==============================
+    // 2) SPECIFICATIONS QUERY
+    // ==============================
+    const [specRows] = await db.query(
+      `
+      SELECT 
+        spec_key,
+        spec_value,
+        unit
+      FROM asset_specs
+      WHERE asset_id = ?
+      `,
+      [id]
+    );
+
+    // Attach specifications to asset object
+    asset.specs = specRows; // array of specs
+
+    // ==============================
+    // 3) SEND COMBINED RESPONSE
+    // ==============================
+    return res.json({ asset });
   } catch (err) {
     console.error("Error fetching asset details:", err.message);
     res.status(500).json({ message: "Server error" });
   }
 };
+
+exports.getAssetTypes = async (req, res) => {
+  try {
+    const [rows] = await db.query(`
+      SELECT type_id, type_name 
+      FROM asset_types 
+    `);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "No asset types found" });
+    }
+
+    return res.json({ types: rows });
+  } catch (err) {
+    console.error("Error fetching asset types:", err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+exports.addAsset = async (req, res) => {
+  const connection = await db.getConnection(); // transaction connection
+
+  try {
+    await connection.beginTransaction();
+
+    const {
+      type_id,
+      brand,
+      model,
+      serial_no,
+      working_status,
+      lab_id,
+      purchase_date,
+      funding_agency,
+      price,
+      warranty,
+      ledger,
+      specs,
+    } = req.body;
+
+    const userId = req.user.id; // from JWT middleware
+
+    // ===============================
+    // 1) INSERT ASSET
+    // ===============================
+    const [assetResult] = await connection.query(
+      `
+      INSERT INTO asset_details 
+      (asset_type_id, brand, model, serial_no, working_status, lab_id,purchase_date, funding_agency, price, created_by)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `,
+      [
+        type_id,
+        brand,
+        model,
+        serial_no,
+        working_status,
+        lab_id,
+        purchase_date,
+        funding_agency,
+        price,
+        userId,
+      ]
+    );
+
+    const assetId = assetResult.insertId;
+
+    // ===============================
+    // 2) INSERT LEDGER (OPTIONAL)
+    // ===============================
+    if (ledger) {
+      await connection.query(
+        `
+        INSERT INTO ledger_details (asset_id, serial_no, page_no, created_by)
+        VALUES (?, ?, ?, ?)
+        `,
+        [assetId, ledger.ledger_serial_no, ledger.page_no, userId]
+      );
+    }
+
+    // ===============================
+    // 3) INSERT WARRANTY (OPTIONAL)
+    // ===============================
+    if (warranty) {
+      await connection.query(
+        `
+        INSERT INTO warranty_details 
+        (asset_id, vendor_name, vendor_contact, warranty_startdate, warranty_enddate)
+        VALUES (?, ?, ?, ?, ?)
+        `,
+        [
+          assetId,
+          warranty.vendor_name,
+          warranty.vendor_contact,
+          warranty.warranty_startdate,
+          warranty.warranty_enddate,
+          userId,
+        ]
+      );
+    }
+
+    // ===============================
+    // 4) INSERT MULTIPLE SPECS (OPTIONAL)
+    // ===============================
+    if (Array.isArray(specs) && specs.length > 0) {
+      for (const s of specs) {
+        if (!s.spec_key && !s.spec_value) continue; // ignore empty rows
+
+        await connection.query(
+          `
+          INSERT INTO asset_specs (asset_id, spec_key, spec_value, unit, created_by)
+          VALUES (?, ?, ?, ?, ?)
+          `,
+          [assetId, s.spec_key, s.spec_value, s.unit, userId]
+        );
+      }
+    }
+
+    // ===============================
+    // 5) COMMIT TRANSACTION
+    // ===============================
+    await connection.commit();
+    connection.release();
+
+    res.json({
+      message: "Asset added successfully",
+      asset_id: assetId,
+    });
+  } catch (err) {
+    await connection.rollback();
+    connection.release();
+
+    console.error("Add Asset Error:", err.sqlMessage);
+    res.status(500).json({ message: "Server error", error: err.sqlMessage });
+  }
+};
+
+// PUT /api/assets/:id
+exports.updateAsset = async (req, res) => {
+  const connection = await db.getConnection();
+  try {
+    await connection.beginTransaction();
+
+    const assetId = req.params.id;
+    const userId = req.user.id;
+
+    const { basic, ledger, warranty, specs } = req.body;
+
+    const fix = (v) => (v === "" ? null : v);
+
+    /* -------------------------
+       BASIC INFO UPDATE
+    --------------------------*/
+    if (basic) {
+      const fields = [];
+      const params = [];
+
+      const allowed = [
+        "asset_type_id",
+        "brand",
+        "model",
+        "serial_no",
+        "working_status",
+        "lab_id",
+        "purchase_date",
+        "funding_agency",
+        "price",
+      ];
+
+      for (const k of allowed) {
+        if (basic[k] !== undefined) {
+          fields.push(`${k} = ?`);
+          params.push(fix(basic[k]));
+        }
+      }
+
+      if (fields.length > 0) {
+        params.push(assetId);
+
+        await connection.query(
+          `UPDATE asset_details SET ${fields.join(
+            ", "
+          )}, updated_at = CURRENT_TIMESTAMP WHERE asset_id = ?`,
+          params
+        );
+      }
+    }
+
+    /* -------------------------
+       LEDGER UPSERT
+    --------------------------*/
+    if (ledger !== undefined) {
+      if (!ledger) {
+        await connection.query(
+          `DELETE FROM ledger_details WHERE asset_id = ?`,
+          [assetId]
+        );
+      } else if (ledger.ledger_id) {
+        await connection.query(
+          `UPDATE ledger_details 
+           SET serial_no = ?, page_no = ?
+           WHERE ledger_id = ? AND asset_id = ?`,
+          [
+            fix(ledger.ledger_serial_no),
+            fix(ledger.page_no),
+            ledger.ledger_id,
+            assetId,
+          ]
+        );
+      } else {
+        await connection.query(
+          `INSERT INTO ledger_details (asset_id, serial_no, page_no, created_by) 
+           VALUES (?, ?, ?, ?)`,
+          [
+            assetId,
+            fix(ledger.ledger_serial_no),
+            fix(ledger.page_no),
+            userId,
+          ]
+        );
+      }
+    }
+
+    /* -------------------------
+       WARRANTY UPSERT
+    --------------------------*/
+    if (warranty !== undefined) {
+      if (!warranty) {
+        await connection.query(
+          `DELETE FROM warranty_details WHERE asset_id = ?`,
+          [assetId]
+        );
+      } else if (warranty.warranty_id) {
+        await connection.query(
+          `UPDATE warranty_details
+           SET vendor_name = ?, vendor_contact = ?, warranty_startdate = ?, 
+               warranty_enddate = ?, updated_at = CURRENT_TIMESTAMP
+           WHERE warranty_id = ? AND asset_id = ?`,
+          [
+            fix(warranty.vendor_name),
+            fix(warranty.vendor_contact),
+            fix(warranty.warranty_startdate),
+            fix(warranty.warranty_enddate),
+            warranty.warranty_id,
+            assetId,
+          ]
+        );
+      } else {
+        await connection.query(
+          `INSERT INTO warranty_details 
+           (asset_id, vendor_name, vendor_contact, warranty_startdate, warranty_enddate, created_by) 
+           VALUES (?, ?, ?, ?, ?, ?)`,
+          [
+            assetId,
+            fix(warranty.vendor_name),
+            fix(warranty.vendor_contact),
+            fix(warranty.warranty_startdate),
+            fix(warranty.warranty_enddate),
+            userId,
+          ]
+        );
+      }
+    }
+
+    /* -------------------------
+       SPECIFICATIONS REPLACE
+    --------------------------*/
+    if (specs !== undefined) {
+      await connection.query(
+        `DELETE FROM asset_specs WHERE asset_id = ?`,
+        [assetId]
+      );
+
+      if (specs.length > 0) {
+        const sql = `INSERT INTO asset_specs 
+          (asset_id, spec_key, spec_value, unit, created_by)
+          VALUES (?, ?, ?, ?, ?)`;
+
+        for (const s of specs) {
+          if (!s.spec_key && !s.spec_value) continue;
+
+          await connection.query(sql, [
+            assetId,
+            s.spec_key,
+            s.spec_value,
+            fix(s.unit),
+            userId,
+          ]);
+        }
+      }
+    }
+
+    await connection.commit();
+    connection.release();
+    return res.json({ message: "Asset updated successfully" });
+  } catch (err) {
+    await connection.rollback();
+    connection.release();
+    console.error("Update error:", err);
+    return res.status(500).json({ message: "Server error", error: err });
+  }
+};
+

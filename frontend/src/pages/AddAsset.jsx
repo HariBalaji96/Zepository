@@ -9,7 +9,6 @@ export default function AddAsset() {
   const [labs, setLabs] = useState([]);
 
   const [asset, setAsset] = useState({
-    asset_name: "",
     type_id: "",
     brand: "",
     model: "",
@@ -35,9 +34,22 @@ export default function AddAsset() {
     page_no: "",
   });
 
+  const [hasSpecs, setHasSpecs] = useState(false);
+  const [specs, setSpecs] = useState([
+    { spec_key: "", spec_value: "", unit: "" },
+  ]);
+
   useEffect(() => {
-    api.get("/assets/types").then((res) => setTypes(res.data.types));
-    api.get("/labs").then((res) => setLabs(res.data.labs));
+    api
+      .get("/assets/types", {
+        headers: { Authorization: "Bearer " + localStorage.getItem("token") },
+      })
+      .then((res) => setTypes(res.data.types));
+    api
+      .get("/labs", {
+        headers: { Authorization: "Bearer " + localStorage.getItem("token") },
+      })
+      .then((res) => setLabs(res.data.labs));
   }, []);
 
   const handleAssetChange = (e) => {
@@ -52,12 +64,28 @@ export default function AddAsset() {
     setLedger({ ...ledger, [e.target.name]: e.target.value });
   };
 
+  const handleSpecChange = (index, field, value) => {
+    const updated = [...specs];
+    updated[index][field] = value;
+    setSpecs(updated);
+  };
+
+  const addSpecRow = () => {
+    setSpecs([...specs, { spec_key: "", spec_value: "", unit: "" }]);
+  };
+
+  const removeSpecRow = (index) => {
+    const updated = specs.filter((_, i) => i !== index);
+    setSpecs(updated);
+  };
+
   const handleSubmit = async () => {
     try {
       const finalData = {
         ...asset,
         warranty: hasWarranty ? warranty : null,
         ledger: hasLedger ? ledger : null,
+        specs: hasSpecs ? specs : [],
       };
 
       await api.post("/assets/add", finalData, {
@@ -84,9 +112,6 @@ export default function AddAsset() {
           {/* LEFT BLOCK */}
           <div className={styles.block}>
             <h2 className={styles.blockTitle}>Basic Information</h2>
-
-            <label>Asset Name</label>
-            <input name="asset_name" onChange={handleAssetChange} />
 
             <label>Asset Type</label>
             <select name="type_id" onChange={handleAssetChange}>
@@ -165,12 +190,13 @@ export default function AddAsset() {
             <label>Cost</label>
             <input type="number" name="price" onChange={handleAssetChange} />
 
+            {/* Warranty */}
             <label className={styles.warrantyCheck}>
               <input
                 type="checkbox"
                 checked={hasWarranty}
-                className={styles.checkInput}
                 onChange={() => setHasWarranty(!hasWarranty)}
+                className={styles.checkInput}
               />
               Include Warranty Details
             </label>
@@ -198,6 +224,60 @@ export default function AddAsset() {
                   name="warranty_enddate"
                   onChange={handleWarrantyChange}
                 />
+              </div>
+            )}
+
+            {/* SPECIFICATIONS */}
+            <label className={styles.specCheck}>
+              <input
+                type="checkbox"
+                checked={hasSpecs}
+                className={styles.checkInput}
+                onChange={() => setHasSpecs(!hasSpecs)}
+              />
+              Include Specifications
+            </label>
+
+            {hasSpecs && (
+              <div className={styles.specBox}>
+                <h2 className={styles.blockTitle}>Specifications</h2>
+
+                {specs.map((spec, index) => (
+                  <div key={index} className={styles.specRow}>
+                    <input
+                      placeholder="Spec Key (e.g., Resolution)"
+                      value={spec.spec_key}
+                      onChange={(e) =>
+                        handleSpecChange(index, "spec_key", e.target.value)
+                      }
+                    />
+                    <input
+                      placeholder="Spec Value (e.g., 1920x1080)"
+                      value={spec.spec_value}
+                      onChange={(e) =>
+                        handleSpecChange(index, "spec_value", e.target.value)
+                      }
+                    />
+                    <input
+                      placeholder="Unit (optional)"
+                      value={spec.unit}
+                      onChange={(e) =>
+                        handleSpecChange(index, "unit", e.target.value)
+                      }
+                    />
+
+                    <button
+                      className={styles.removeButton}
+                      onClick={() => removeSpecRow(index)}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+
+                <button className={styles.addSpecButton} onClick={addSpecRow}>
+                  + Add Specification
+                </button>
               </div>
             )}
           </div>

@@ -6,6 +6,7 @@ import Assets from "./pages/Assets";
 import AssetDetails from "./pages/AssetDetails";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AddAsset from "./pages/AddAsset";
+import EditAsset from "./pages/EditAsset";
 
 function App() {
   return (
@@ -47,6 +48,16 @@ function App() {
           element={
             <ProtectedRoute>
               <AddAsset />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* EDIT ASSET (new) */}
+        <Route
+          path="/assets/:id/edit"
+          element={
+            <ProtectedRoute>
+              <EditAsset />
             </ProtectedRoute>
           }
         />

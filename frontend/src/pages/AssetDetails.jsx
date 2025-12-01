@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import api from "../services/api";
 import styles from "./public/Assets.module.css";
 import Header from "../components/Header";
@@ -8,6 +8,7 @@ import Footer from "../components/Footer";
 export default function AssetDetails() {
   const { id } = useParams();
   const [asset, setAsset] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     api
@@ -17,101 +18,189 @@ export default function AssetDetails() {
         },
       })
       .then((res) => setAsset(res.data.asset))
-      .catch((err) => {
-        console.log("Stats error:", err);
-      });
+      .catch((err) => console.log("Error:", err));
   }, [id]);
+
+  const formatDate = (str) => {
+    if (!str) return "";
+
+    const date = str.includes("T") ? str.split("T")[0] : str; // "2025-11-30"
+    const [year, month, day] = date.split("-");
+
+    return `${day}-${month}-${year}`;
+  };
 
   if (!asset) return <h2>Loading...</h2>;
 
   return (
     <div className={styles.detailsPageWrapper}>
-  <Header />
+      <Header />
 
-  <div className={styles.detailsContent}>
-    <div className={styles.buttonDiv}>
-      <button
-        className={styles.backButton}
-        onClick={() => window.history.back()}
-      >
-        ← Back
-      </button>
-    </div>
-
-    <h1 className={styles.pageTitle}>
-      {asset.brand + " - " + asset.model}
-    </h1>
-
-    <div className={styles.splitContainer}>
-      {/* LEFT BLOCK */}
-      <div className={styles.block}>
-
-        <div className={styles.blockHeader}>
-          <h2 className={styles.blockTitle}>Basic Information:</h2>
-          <button className={styles.editButton}>Edit</button>
+      <div className={styles.detailsContent}>
+        <div className={styles.buttonDiv}>
+          <button
+            className={styles.backButton}
+            onClick={() => window.history.back()}
+          >
+            ← Back
+          </button>
         </div>
 
-        <p><strong>Serial No:</strong> {asset.serial_no}</p>
-        <p>
-          <strong>Status:</strong>{" "}
-          <span className={`${styles.status} ${styles[asset.working_status]}`}>
-            {asset.working_status}
-          </span>
-        </p>
-        <p><strong>Brand:</strong> {asset.brand}</p>
-        <p><strong>Model:</strong> {asset.model}</p>
-        <p><strong>Type:</strong> {asset.type_name}</p>
-        <p><strong>Location:</strong> {asset.lab_name}</p>
+        <h1 className={styles.pageTitle}>
+          {asset.brand + " - " + asset.model}
+        </h1>
 
-        <div className={styles.blockHeader}>
-          <h2 className={styles.blockTitle}>Ledger Information:</h2>
-          <button className={styles.editButton}>Edit</button>
+        <div className={styles.splitContainer}>
+          {/* LEFT BLOCK */}
+          <div className={styles.block}>
+            {/* Basic Info */}
+            <div className={styles.blockHeader}>
+              <h2 className={styles.blockTitle}>Basic Information</h2>
+              <button
+                className={styles.editButton}
+                onClick={() => navigate(`/assets/${id}/edit`)}
+              >
+                Edit
+              </button>
+            </div>
+
+            <p>
+              <strong>Serial No:</strong> {asset.serial_no}
+            </p>
+            <p>
+              <strong>Status:</strong>
+              <span
+                className={`${styles.status} ${styles[asset.working_status]}`}
+              >
+                {asset.working_status}
+              </span>
+            </p>
+            <p>
+              <strong>Brand:</strong> {asset.brand}
+            </p>
+            <p>
+              <strong>Model:</strong> {asset.model}
+            </p>
+            <p>
+              <strong>Type:</strong> {asset.type_name}
+            </p>
+            <p>
+              <strong>Location:</strong> {asset.lab_name}
+            </p>
+
+            {/* Ledger Info */}
+            <div className={styles.blockHeader}>
+              <h2 className={styles.blockTitle}>Ledger Information</h2>
+              <button
+                className={styles.editButton}
+                onClick={() => navigate(`/assets/${id}/edit`)}
+              >
+                {asset.ledger_id ? "Edit" : "Add"}
+              </button>
+            </div>
+
+            {asset.ledger_id ? (
+              <>
+                <p>
+                  <strong>S.No:</strong> {asset.ledger_serial_no}
+                </p>
+                <p>
+                  <strong>Page No:</strong> {asset.page_no}
+                </p>
+              </>
+            ) : (
+              <p>No Ledger Details Available</p>
+            )}
+          </div>
+
+          {/* RIGHT BLOCK */}
+          <div className={styles.block}>
+            {/* Additional Info */}
+            <div className={styles.blockHeader}>
+              <h2 className={styles.blockTitle}>Additional Details</h2>
+              <button
+                className={styles.editButton}
+                onClick={() => navigate(`/assets/${id}/edit`)}
+              >
+                Edit
+              </button>
+            </div>
+
+            <p>
+              <strong>Purchase Date:</strong> {formatDate(asset.purchase_date)}
+            </p>
+            <p>
+              <strong>Funding Agency:</strong> {asset.funding_agency}
+            </p>
+            <p>
+              <strong>Cost:</strong> {asset.price}
+            </p>
+            <p>
+              <strong>Last Update:</strong> {formatDate(asset.updated_at)}
+            </p>
+
+            {/* Warranty Info */}
+            <div className={styles.blockHeader}>
+              <h2 className={styles.blockTitle}>Warranty Details</h2>
+              <button
+                className={styles.editButton}
+                onClick={() => navigate(`/assets/${id}/edit`)}
+              >
+                {asset.warranty_id ? "Edit" : "Add"}
+              </button>
+            </div>
+
+            {asset.warranty_id ? (
+              <>
+                <p>
+                  <strong>Vendor Name:</strong> {asset.vendor_name}
+                </p>
+                <p>
+                  <strong>Vendor Contact:</strong> {asset.vendor_contact}
+                </p>
+                <p>
+                  <strong>Warranty Start Date:</strong>{" "}
+                  {formatDate(asset.warranty_startdate)}
+                </p>
+                <p>
+                  <strong>Warranty End Date:</strong>{" "}
+                  {formatDate(asset.warranty_enddate)}
+                </p>
+              </>
+            ) : (
+              <p>No Warranty Available</p>
+            )}
+          </div>
         </div>
 
-        {asset.ledger_id ? (
-          <>
-            <p><strong>S.No:</strong> {asset.ledger_serial_no}</p>
-            <p><strong>Page No:</strong> {asset.page_no}</p>
-          </>
-        ) : (
-          <p>Ledger Details not Available</p>
-        )}
+        {/* SPECIFICATIONS BLOCK */}
+        <div className={styles.blockFull}>
+          <div className={styles.blockHeader}>
+            <h2 className={styles.blockTitle}>Specifications</h2>
+            <button
+              className={styles.editButton}
+              onClick={() => navigate(`/assets/${id}/edit`)}
+            >
+              {asset.specs && asset.specs.length > 0 ? "Edit" : "Add"}
+            </button>
+          </div>
+
+          {asset.specs && asset.specs.length > 0 ? (
+            <div className={styles.specList}>
+              {asset.specs.map((spec, idx) => (
+                <p key={idx} className={styles.specItem}>
+                  <strong>{spec.spec_key}:</strong> {spec.spec_value}{" "}
+                  {spec.unit ? spec.unit : ""}
+                </p>
+              ))}
+            </div>
+          ) : (
+            <p>No Specifications Available</p>
+          )}
+        </div>
       </div>
 
-      {/* RIGHT BLOCK */}
-      <div className={styles.block}>
-
-        <div className={styles.blockHeader}>
-          <h2 className={styles.blockTitle}>Additional Details:</h2>
-          <button className={styles.editButton}>Edit</button>
-        </div>
-
-        <p><strong>Purchase Date:</strong> {asset.purchase_date}</p>
-        <p><strong>Funding Agency:</strong> {asset.funding_agency}</p>
-        <p><strong>Cost:</strong> {asset.price}</p>
-        <p><strong>Last Update:</strong> {asset.updated_at}</p>
-
-        <div className={styles.blockHeader}>
-          <h2 className={styles.blockTitle}>Warranty Details:</h2>
-          <button className={styles.editButton}>Edit</button>
-        </div>
-
-        {asset.warranty_id ? (
-          <>
-            <p><strong>Vendor Name:</strong> {asset.vendor_name}</p>
-            <p><strong>Vendor Contact:</strong> {asset.vendor_contact}</p>
-            <p><strong>Warranty Start Date:</strong> {asset.warranty_startdate}</p>
-            <p><strong>Warranty End Date:</strong> {asset.warranty_enddate}</p>
-          </>
-        ) : (
-          <p>No Warranty Available</p>
-        )}
-      </div>
+      <Footer />
     </div>
-  </div>
-
-  <Footer />
-</div>
-
   );
 }
