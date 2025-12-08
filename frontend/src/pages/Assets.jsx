@@ -11,7 +11,6 @@ export default function Assets() {
   const navigate = useNavigate();
 
   useEffect(() => {
-
     api
       .get("/assets", {
         headers: {

@@ -240,7 +240,6 @@ export default function EditAsset() {
             >
               <option value="working">Working</option>
               <option value="defective">Defective</option>
-              <option value="under_service">Under Service</option>
             </select>
 
             <label>Location (Lab)</label>

@@ -5,6 +5,7 @@ const cors = require("cors");
 const authRoutes = require("./routes/auth");
 const assetRoutes = require("./routes/assets");
 const labRoutes = require("./routes/labs");
+const serviceRoutes = require("./routes/service");
 
 const app = express();
 const PORT = 5000;
@@ -14,6 +15,7 @@ app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/assets", assetRoutes);
+app.use("/api/service", serviceRoutes);
 app.use("/api/labs", labRoutes);
 
 app.listen(PORT, () => {

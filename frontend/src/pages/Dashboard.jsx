@@ -38,7 +38,7 @@ export default function Dashboard() {
       <div className={styles.headerDiv}>
         <h1 className={styles.title}>
           <Link to="/" className={styles.titleLink}>
-            Zepositroy
+            Zepository
           </Link>
         </h1>
         {user && <p className={styles.greet}>Welcome, {user.name}!</p>}

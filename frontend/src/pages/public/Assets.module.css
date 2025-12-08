@@ -112,7 +112,7 @@
   font-size: 14px;
   font-weight: 500;
   color: white;
-  text-transform: capitalize;
+  text-transform: uppercase;
 }
 
 /* ===============================
@@ -234,11 +234,9 @@
 }
 
 .block p span {
-  width: 100px;
+  width: 150px;
   text-align: center;
 }
-
-
 
 /* Specification Details */
 
@@ -274,9 +272,6 @@
   }
 }
 
-
-
-
 /* ===============================
    STATUS BADGES
 ==================================*/
@@ -285,21 +280,20 @@
   border-radius: 6px;
   color: white;
   font-weight: 500;
-  text-transform: capitalize;
+  text-transform: uppercase;
 }
-
 
 /* Status Colors */
 .working {
-  background-color: #0f6a0f;
+  background-color: #00d000;
 }
 
 .defective {
-  background-color: #b30000;
+  background-color: #ff0000;
 }
 
 .under_service {
-  background-color: #856404;
+  background-color: #1900ff;
 }
 
 /* ===============================
@@ -330,5 +324,3 @@
     margin-top: 5px;
   }
 }
-
-

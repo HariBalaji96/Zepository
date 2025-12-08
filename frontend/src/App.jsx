@@ -7,6 +7,8 @@ import AssetDetails from "./pages/AssetDetails";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AddAsset from "./pages/AddAsset";
 import EditAsset from "./pages/EditAsset";
+import SendToService from "./pages/SendToService";
+import UnderService from "./pages/ServiceList";
 
 function App() {
   return (
@@ -52,12 +54,31 @@ function App() {
           }
         />
 
-        {/* EDIT ASSET (new) */}
+        {/* EDIT ASSET */}
         <Route
           path="/assets/:id/edit"
           element={
             <ProtectedRoute>
               <EditAsset />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Send Service */}
+        <Route
+          path="/service/send/:id"
+          element={
+            <ProtectedRoute>
+              <SendToService />
+            </ProtectedRoute>
+          }
+        />
+        {/* List of Asset send for Service */}
+        <Route
+          path="/services"
+          element={
+            <ProtectedRoute>
+              <UnderService />
             </ProtectedRoute>
           }
         />

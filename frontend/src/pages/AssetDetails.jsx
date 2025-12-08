@@ -69,11 +69,31 @@ export default function AssetDetails() {
             </p>
             <p>
               <strong>Status:</strong>
-              <span
-                className={`${styles.status} ${styles[asset.working_status]}`}
-              >
-                {asset.working_status}
-              </span>
+
+              {asset.working_status === "defective" ? (
+                <>
+                  <span
+                    className={`${styles.status} ${
+                      styles[asset.working_status]
+                    }`}
+                  >
+                    {asset.working_status}
+                  </span>
+
+                  <button
+                    className={styles.editButton}
+                    onClick={() => navigate(`/service/send/${id}`)}
+                  >
+                    Send to Service
+                  </button>
+                </>
+              ) : (
+                <span
+                  className={`${styles.status} ${styles[asset.working_status]}`}
+                >
+                  {asset.working_status}
+                </span>
+              )}
             </p>
             <p>
               <strong>Brand:</strong> {asset.brand}
