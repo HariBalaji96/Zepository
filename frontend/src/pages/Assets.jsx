@@ -8,6 +8,14 @@ import Footer from "../components/Footer";
 export default function Assets() {
   const [assets, setAssets] = useState([]);
   const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [labFilter, setLabFilter] = useState("");
+  const [typeFilter, setTypeFilter] = useState("");
+
+  const uniqueStatuses = [...new Set(assets.map((a) => a.working_status))];
+  const uniqueLabs = [...new Set(assets.map((a) => a.lab_name))];
+  const uniqueTypes = [...new Set(assets.map((a) => a.type_name))];
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -27,16 +35,22 @@ export default function Assets() {
   const filteredAssets = assets.filter((a) => {
     const s = search.toLowerCase();
 
-    return (
+    const matchesSearch =
       (a.asset_name?.toLowerCase() || "").includes(s) ||
       (a.serial_no?.toLowerCase() || "").includes(s) ||
       (a.brand?.toLowerCase() || "").includes(s) ||
       (a.model?.toLowerCase() || "").includes(s) ||
-      (a.type_name?.toLowerCase() || "").includes(s) ||
-      (a.lab_name?.toLowerCase() || "").includes(s) ||
-      (a.working_status?.toLowerCase() || "").includes(s) ||
-      a.asset_id?.toString().includes(s)
-    );
+      a.asset_id?.toString().includes(s);
+
+    const matchesStatus = statusFilter
+      ? a.working_status === statusFilter
+      : true;
+
+    const matchesLab = labFilter ? a.lab_name === labFilter : true;
+
+    const matchesType = typeFilter ? a.type_name === typeFilter : true;
+
+    return matchesSearch && matchesStatus && matchesLab && matchesType;
   });
 
   const openDetails = (id) => {
@@ -68,6 +82,47 @@ export default function Assets() {
         <Link to="/add" className={styles.addButton}>
           Add Asset
         </Link>
+
+        <div className={styles.filterBar}>
+          {/* Status Filter */}
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
+            <option value="">All Status</option>
+            {uniqueStatuses.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+          </select>
+
+          {/* Lab Filter */}
+          <select
+            value={labFilter}
+            onChange={(e) => setLabFilter(e.target.value)}
+          >
+            <option value="">All Labs</option>
+            {uniqueLabs.map((lab) => (
+              <option key={lab} value={lab}>
+                {lab}
+              </option>
+            ))}
+          </select>
+
+          {/* Asset Type Filter */}
+          <select
+            value={typeFilter}
+            onChange={(e) => setTypeFilter(e.target.value)}
+          >
+            <option value="">All Types</option>
+            {uniqueTypes.map((type) => (
+              <option key={type} value={type}>
+                {type}
+              </option>
+            ))}
+          </select>
+        </div>
 
         <div className={styles.list}>
           {filteredAssets.length === 0 ? (

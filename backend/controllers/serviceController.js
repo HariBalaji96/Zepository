@@ -84,3 +84,60 @@ exports.getUnderService = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+
+
+exports.completeService = async (req, res) => {
+  const connection = await db.getConnection();
+
+  try {
+    await connection.beginTransaction();
+
+    const serviceId = req.params.id;
+    const { service_cost, service_note } = req.body;
+
+    const [serviceRows] = await connection.query(
+      `SELECT asset_id FROM service_requests WHERE service_id = ? AND service_status = 'sent'`,
+      [serviceId]
+    );
+
+    if (serviceRows.length === 0) {
+      await connection.rollback();
+      connection.release();
+      return res.status(404).json({ message: "Active service not found" });
+    }
+
+    const assetId = serviceRows[0].asset_id;
+
+    // 2️⃣ Update service request
+    await connection.query(
+      `UPDATE service_requests
+       SET service_status = 'completed',
+           service_cost = ?,
+           after_note = ?
+       WHERE service_id = ?`,
+      [service_cost || 0, service_note || null, serviceId]
+    );
+
+    // 3️⃣ Update asset working status
+    await connection.query(
+      `UPDATE asset_details
+       SET working_status = 'working'
+       WHERE asset_id = ?`,
+      [assetId]
+    );
+
+    // 4️⃣ Commit transaction
+    await connection.commit();
+    connection.release();
+
+    res.json({ message: "Service completed successfully" });
+
+  } catch (err) {
+    await connection.rollback();
+    connection.release();
+
+    console.error("Complete service error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};

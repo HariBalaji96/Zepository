@@ -296,6 +296,20 @@
   background-color: #1900ff;
 }
 
+.filterBar {
+  display: flex;
+  gap: 12px;
+  margin: 15px 0;
+}
+
+.filterBar select {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #dcdcdc;
+  font-size: 14px;
+  cursor: pointer;
+}
+
 /* ===============================
    RESPONSIVE (Phones, small tabs)
 ==================================*/

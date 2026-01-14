@@ -8,7 +8,12 @@ import { useNavigate } from "react-router-dom";
 export default function UnderService() {
   const [list, setList] = useState([]);
   const [search, setSearch] = useState("");
-  const [selected, setSelected] = useState(null); // MODAL DATA
+  const [selected, setSelected] = useState(null); // view modal
+  const [completeModal, setCompleteModal] = useState(false); // complete modal
+
+  const [serviceCost, setServiceCost] = useState("");
+  const [completionNote, setCompletionNote] = useState("");
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -24,16 +29,13 @@ export default function UnderService() {
 
   const formatDate = (str) => {
     if (!str) return "";
-
-    const date = str.includes("T") ? str.split("T")[0] : str; // "2025-11-30"
+    const date = str.includes("T") ? str.split("T")[0] : str;
     const [year, month, day] = date.split("-");
-
     return `${day}-${month}-${year}`;
   };
 
   const filtered = list.filter((item) => {
     const s = search.toLowerCase();
-
     return (
       item.brand.toLowerCase().includes(s) ||
       item.model.toLowerCase().includes(s) ||
@@ -44,6 +46,33 @@ export default function UnderService() {
     );
   });
 
+  const finishService = () => {
+    api
+      .put(
+        `/service/complete/${selected.service_id}`,
+        {
+          service_cost: serviceCost,
+          service_note: completionNote,
+        },
+        {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        }
+      )
+      .then(() => {
+        alert("Service marked as completed");
+        setCompleteModal(false);
+        setSelected(null);
+
+        // Refresh list
+        setList((prev) =>
+          prev.filter((s) => s.service_id !== selected.service_id)
+        );
+      })
+      .catch(() => alert("Error completing service"));
+  };
+
   return (
     <div className={styles.pageWrapper}>
       <Header />
@@ -51,7 +80,6 @@ export default function UnderService() {
       <div className={styles.contentWrapper}>
         <h1 className={styles.pageTitle}>Assets Under Service</h1>
 
-        {/* Search Bar */}
         <input
           type="text"
           placeholder="Search assets..."
@@ -60,7 +88,6 @@ export default function UnderService() {
           onChange={(e) => setSearch(e.target.value)}
         />
 
-        {/* List Container */}
         <div className={styles.list}>
           {filtered.length === 0 ? (
             <p>No assets under service.</p>
@@ -69,7 +96,7 @@ export default function UnderService() {
               <div key={item.service_id} className={styles.row}>
                 <div
                   className={styles.left}
-                  onClick={() => navigate(`/service/${item.service_id}`)}
+                  onClick={() => navigate(`/assets/${item.asset_id}`)}
                 >
                   <h3 className={styles.assetName}>
                     {item.brand} - {item.model}
@@ -91,7 +118,6 @@ export default function UnderService() {
                     {item.service_status}
                   </span>
 
-                  {/* View Details Button */}
                   <button
                     className={styles.viewButton}
                     onClick={() => setSelected(item)}
@@ -107,42 +133,74 @@ export default function UnderService() {
 
       <Footer />
 
-      {/* MODAL OVERLAY + WINDOW */}
-      {selected && (
+      {/* VIEW DETAILS MODAL */}
+      {selected && !completeModal && (
         <div className={styles.overlay} onClick={() => setSelected(null)}>
-          <div
-            className={styles.modal}
-            onClick={(e) => e.stopPropagation()} // prevent closing when clicking inside
-          >
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
             <h2 className={styles.modalTitle}>Service Details</h2>
 
-            <p>
-              <strong>Asset:</strong> {selected.brand} - {selected.model}
-            </p>
-            <p>
-              <strong>Serial No:</strong> {selected.serial_no}
-            </p>
-            <p>
-              <strong>Service Provider:</strong> {selected.service_provider}
-            </p>
-            <p>
-              <strong>Service Through:</strong> {selected.service_through}
-            </p>
-            <p>
-              <strong>Sent Date:</strong> {formatDate(selected.sent_date)}
-            </p>
+            <p><strong>Asset:</strong> {selected.brand} - {selected.model}</p>
+            <p><strong>Serial:</strong> {selected.serial_no}</p>
+            <p><strong>Provider:</strong> {selected.service_provider}</p>
+            <p><strong>Through:</strong> {selected.service_through}</p>
+            <p><strong>Sent Date:</strong> {formatDate(selected.sent_date)}</p>
 
-            <h3>Service Note:</h3>
+            <h3>Service Note</h3>
             <p className={styles.noteBox}>
               {selected.service_note || "No notes available"}
             </p>
 
-            <button
-              className={styles.closeBtn}
-              onClick={() => setSelected(null)}
-            >
-              Close
-            </button>
+            <div className={styles.modalActions}>
+              <button
+                className={styles.completeBtn}
+                onClick={() => setCompleteModal(true)}
+              >
+                Complete Service
+              </button>
+
+              <button
+                className={styles.closeBtn}
+                onClick={() => setSelected(null)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* COMPLETE SERVICE MODAL */}
+      {completeModal && (
+        <div className={styles.overlay} onClick={() => setCompleteModal(false)}>
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <h2 className={styles.modalTitle}>Complete Service</h2>
+
+            <label>Service Cost</label>
+            <input
+              type="number"
+              className={styles.input}
+              value={serviceCost}
+              onChange={(e) => setServiceCost(e.target.value)}
+            />
+
+            <label>Completion Note</label>
+            <textarea
+              className={styles.textarea}
+              value={completionNote}
+              onChange={(e) => setCompletionNote(e.target.value)}
+            />
+
+            <div className={styles.modalActions}>
+              <button className={styles.completeBtn} onClick={finishService}>
+                Finish Service
+              </button>
+              <button
+                className={styles.closeBtn}
+                onClick={() => setCompleteModal(false)}
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}

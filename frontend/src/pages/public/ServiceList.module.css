@@ -195,3 +195,39 @@
     opacity: (1);
   }
 }
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.completeBtn {
+  margin-top: 15px;
+  background: #0f6a0f;
+  color: white;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.completeBtn:hover {
+  background: #0c540c;
+}
+
+.input,
+.textarea {
+  width: 100%;
+  padding: 8px;
+  margin-top: 6px;
+  margin-bottom: 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.textarea {
+  resize: none;
+  height: 80px;
+}
