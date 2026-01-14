@@ -310,6 +310,35 @@
   cursor: pointer;
 }
 
+/* SERVICE HISTORY */
+.serviceList {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.serviceCard {
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+.serviceCard p {
+  margin-top: 10px;
+}
+.serviceHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.serviceProvider {
+  font-size: 24px;
+  font-weight: 600;
+}
+
 /* ===============================
    RESPONSIVE (Phones, small tabs)
 ==================================*/

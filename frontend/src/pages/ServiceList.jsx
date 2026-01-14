@@ -10,7 +10,7 @@ export default function UnderService() {
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState(null); // view modal
   const [completeModal, setCompleteModal] = useState(false); // complete modal
-
+  const [claimWarranty, setClaimWarranty] = useState("no");
   const [serviceCost, setServiceCost] = useState("");
   const [completionNote, setCompletionNote] = useState("");
 
@@ -51,8 +51,9 @@ export default function UnderService() {
       .put(
         `/service/complete/${selected.service_id}`,
         {
-          service_cost: serviceCost,
+          service_cost: claimWarranty === "yes" ? 0 : serviceCost,
           service_note: completionNote,
+          claim_warranty: claimWarranty === "yes" ? 1 : 0, // optional (for future use)
         },
         {
           headers: {
@@ -64,8 +65,10 @@ export default function UnderService() {
         alert("Service marked as completed");
         setCompleteModal(false);
         setSelected(null);
+        setServiceCost("");
+        setCompletionNote("");
+        setClaimWarranty("no");
 
-        // Refresh list
         setList((prev) =>
           prev.filter((s) => s.service_id !== selected.service_id)
         );
@@ -139,11 +142,21 @@ export default function UnderService() {
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
             <h2 className={styles.modalTitle}>Service Details</h2>
 
-            <p><strong>Asset:</strong> {selected.brand} - {selected.model}</p>
-            <p><strong>Serial:</strong> {selected.serial_no}</p>
-            <p><strong>Provider:</strong> {selected.service_provider}</p>
-            <p><strong>Through:</strong> {selected.service_through}</p>
-            <p><strong>Sent Date:</strong> {formatDate(selected.sent_date)}</p>
+            <p>
+              <strong>Asset:</strong> {selected.brand} - {selected.model}
+            </p>
+            <p>
+              <strong>Serial:</strong> {selected.serial_no}
+            </p>
+            <p>
+              <strong>Provider:</strong> {selected.service_provider}
+            </p>
+            <p>
+              <strong>Through:</strong> {selected.service_through}
+            </p>
+            <p>
+              <strong>Sent Date:</strong> {formatDate(selected.sent_date)}
+            </p>
 
             <h3>Service Note</h3>
             <p className={styles.noteBox}>
@@ -170,19 +183,34 @@ export default function UnderService() {
       )}
 
       {/* COMPLETE SERVICE MODAL */}
+      {/* COMPLETE SERVICE MODAL */}
       {completeModal && (
         <div className={styles.overlay} onClick={() => setCompleteModal(false)}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
             <h2 className={styles.modalTitle}>Complete Service</h2>
 
+            {/* Claim Warranty */}
+            <label>Claim in Warranty?</label>
+            <select
+              className={styles.input}
+              value={claimWarranty}
+              onChange={(e) => setClaimWarranty(e.target.value)}
+            >
+              <option value="no">No</option>
+              <option value="yes">Yes</option>
+            </select>
+
+            {/* Service Cost */}
             <label>Service Cost</label>
             <input
               type="number"
               className={styles.input}
-              value={serviceCost}
+              value={claimWarranty === "yes" ? 0 : serviceCost}
+              disabled={claimWarranty === "yes"}
               onChange={(e) => setServiceCost(e.target.value)}
             />
 
+            {/* Completion Note */}
             <label>Completion Note</label>
             <textarea
               className={styles.textarea}

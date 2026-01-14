@@ -218,6 +218,73 @@ export default function AssetDetails() {
             <p>No Specifications Available</p>
           )}
         </div>
+        {/* SERVICE HISTORY BLOCK */}
+        <div className={styles.blockFull}>
+          <div className={styles.blockHeader}>
+            <h2 className={styles.blockTitle}>Service History</h2>
+          </div>
+
+          {asset.services && asset.services.length > 0 ? (
+            <div className={styles.serviceList}>
+              {asset.services.map((service) => (
+                <div key={service.service_id} className={styles.serviceCard}>
+                  <div className={styles.serviceHeader}>
+                    <span className={styles.serviceProvider}>
+                      {service.service_provider}
+                    </span>
+
+                    <span
+                      className={`${styles.statusTag} ${
+                        styles[service.service_status]
+                      }`}
+                    >
+                      {service.service_status}
+                    </span>
+                  </div>
+
+                  <p>
+                    <strong>Sent Date:</strong> {formatDate(service.sent_date)}
+                  </p>
+
+                  <p>
+                    <strong>Service Through:</strong> {service.service_through}
+                  </p>
+
+                  <p>
+                    <strong>Warranty Claim:</strong>{" "}
+                    {service.warranty_claim === 1 ? "Yes" : "No"}
+                  </p>
+
+                  <p>
+                    <strong>Initial Note:</strong> {service.service_note || "—"}
+                  </p>
+
+                  <p>
+                    <strong>Service Status:</strong>{" "}
+                    {service.service_status === "completed"
+                      ? "Completed"
+                      : "Under Service"}
+                  </p>
+
+                  {service.service_status === "completed" && (
+                    <>
+                      <p>
+                        <strong>Completion Note:</strong>{" "}
+                        {service.after_note || "—"}
+                      </p>
+
+                      <p>
+                        <strong>Service Cost:</strong> ₹{service.service_cost}
+                      </p>
+                    </>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p>No Service History Available</p>
+          )}
+        </div>
       </div>
 
       <Footer />

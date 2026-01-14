@@ -121,7 +121,7 @@ exports.getAssetById = async (req, res) => {
     const asset = rows[0];
 
     // ==============================
-    // 2) SPECIFICATIONS QUERY
+    // 2) SPECIFICATIONS
     // ==============================
     const [specRows] = await db.query(
       `
@@ -135,18 +135,51 @@ exports.getAssetById = async (req, res) => {
       [id]
     );
 
-    // Attach specifications to asset object
-    asset.specs = specRows; // array of specs
+    asset.specs = specRows; // [] if none
 
     // ==============================
-    // 3) SEND COMBINED RESPONSE
+    // 3) SERVICE HISTORY (NEW)
+    // ==============================
+    const [serviceRows] = await db.query(
+      `
+      SELECT
+        sr.service_id,
+        sr.sent_date,
+        sr.service_note,
+        sr.after_note,
+        sr.service_cost,
+        sr.service_status,
+        sr.service_provider,
+        sr.service_through,
+        sr.warranty_claim,
+        sr.created_at,
+        sr.updated_at,
+
+        ud.user_name AS requested_by_name
+
+      FROM service_requests sr
+      LEFT JOIN user_details ud
+        ON sr.requested_by = ud.user_id
+
+      WHERE sr.asset_id = ?
+      ORDER BY sr.created_at DESC
+      `,
+      [id]
+    );
+
+    asset.services = serviceRows; // [] if no service history
+
+    // ==============================
+    // 4) SEND COMBINED RESPONSE
     // ==============================
     return res.json({ asset });
+
   } catch (err) {
     console.error("Error fetching asset details:", err.message);
     res.status(500).json({ message: "Server error" });
   }
 };
+
 
 exports.getAssetTypes = async (req, res) => {
   try {
@@ -449,4 +482,7 @@ exports.updateAsset = async (req, res) => {
     return res.status(500).json({ message: "Server error", error: err });
   }
 };
+
+
+
 

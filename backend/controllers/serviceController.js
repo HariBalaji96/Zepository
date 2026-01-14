@@ -94,32 +94,49 @@ exports.completeService = async (req, res) => {
     await connection.beginTransaction();
 
     const serviceId = req.params.id;
-    const { service_cost, service_note } = req.body;
+    const {
+      service_cost,
+      service_note,     // completion note (after_note)
+      claim_warranty,   // yes / no
+    } = req.body;
 
-    const [serviceRows] = await connection.query(
-      `SELECT asset_id FROM service_requests WHERE service_id = ? AND service_status = 'sent'`,
+    // 1️⃣ Validate service & get asset_id
+    const [rows] = await connection.query(
+      `SELECT asset_id 
+       FROM service_requests 
+       WHERE service_id = ? AND service_status = 'sent'`,
       [serviceId]
     );
 
-    if (serviceRows.length === 0) {
+    if (rows.length === 0) {
       await connection.rollback();
       connection.release();
-      return res.status(404).json({ message: "Active service not found" });
+      return res.status(404).json({
+        message: "Active service request not found",
+      });
     }
 
-    const assetId = serviceRows[0].asset_id;
+    const assetId = rows[0].asset_id;
 
     // 2️⃣ Update service request
     await connection.query(
       `UPDATE service_requests
-       SET service_status = 'completed',
-           service_cost = ?,
-           after_note = ?
+       SET 
+         service_status = 'completed',
+         after_note = ?,
+         service_cost = ?,
+         warranty_claim = ?,
+         updated_at = NOW()
        WHERE service_id = ?`,
-      [service_cost || 0, service_note || null, serviceId]
+      [
+        service_note || null,
+        claim_warranty === 1 ? 0 : service_cost,
+        claim_warranty,
+        serviceId,
+      ]
     );
 
-    // 3️⃣ Update asset working status
+    // 3️⃣ Update asset status
     await connection.query(
       `UPDATE asset_details
        SET working_status = 'working'
@@ -131,13 +148,17 @@ exports.completeService = async (req, res) => {
     await connection.commit();
     connection.release();
 
-    res.json({ message: "Service completed successfully" });
-
+    return res.json({
+      message: "Service completed successfully",
+    });
   } catch (err) {
     await connection.rollback();
     connection.release();
 
     console.error("Complete service error:", err);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({
+      message: "Server error while completing service",
+    });
   }
 };
+
