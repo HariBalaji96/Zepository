@@ -1,7 +1,7 @@
 import { NavLink, useNavigate, Link } from "react-router-dom";
 import styles from "./Header.module.css";
 
-export default function Header() {
+export default function Header({ userName }) {
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -17,8 +17,26 @@ export default function Header() {
         </Link>
       </h1>
 
+      {/* 👇 SHOW ONLY IF USERNAME EXISTS */}
+      {userName && (
+        <p className={styles.welcomeText}>
+          Welcome, <strong>{userName}</strong>
+        </p>
+      )}
+
       <nav className={styles.navBar}>
         <ul>
+          <li>
+            <NavLink
+              to="/"
+              className={({ isActive }) =>
+                isActive ? styles.activeLink : styles.navLink
+              }
+            >
+              Dashboard
+            </NavLink>
+          </li>
+
           <li>
             <NavLink
               to="/assets"

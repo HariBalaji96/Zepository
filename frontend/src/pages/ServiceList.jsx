@@ -191,14 +191,23 @@ export default function UnderService() {
 
             {/* Claim Warranty */}
             <label>Claim in Warranty?</label>
-            <select
-              className={styles.input}
-              value={claimWarranty}
-              onChange={(e) => setClaimWarranty(e.target.value)}
-            >
-              <option value="no">No</option>
-              <option value="yes">Yes</option>
-            </select>
+
+            {selected.is_warranty_valid === 1 ? (
+              <select
+                className={styles.input}
+                value={claimWarranty}
+                onChange={(e) => setClaimWarranty(e.target.value)}
+              >
+                <option value="no">No</option>
+                <option value="yes">Yes</option>
+              </select>
+            ) : (
+              <input
+                className={styles.input}
+                value="Not eligible (No valid warranty)"
+                disabled
+              />
+            )}
 
             {/* Service Cost */}
             <label>Service Cost</label>

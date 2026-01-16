@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import api from "../services/api";
 import { Link } from "react-router-dom";
 import styles from "./public/Dashboard.module.css";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
 
 export default function Dashboard() {
   const [user, setUser] = useState(null);
@@ -35,30 +37,7 @@ export default function Dashboard() {
 
   return (
     <div className={styles.dashboardWrapper}>
-      <div className={styles.headerDiv}>
-        <h1 className={styles.title}>
-          <Link to="/" className={styles.titleLink}>
-            Zepository
-          </Link>
-        </h1>
-        {user && <p className={styles.greet}>Welcome, {user.name}!</p>}
-
-        <nav className={styles.navBar}>
-          <ul>
-            <li>
-              <Link to="/assets" className={styles.navLink}>
-                Assets
-              </Link>
-            </li>
-            <li>
-              <Link to="/services" className={styles.navLink}>
-                Service Details
-              </Link>
-            </li>
-            <li onClick={handleLogout}>Logout</li>
-          </ul>
-        </nav>
-      </div>
+      <Header userName={user?.name} />
 
       <div className={styles.grid}>
         {stats.map((item, index) => (
@@ -87,9 +66,7 @@ export default function Dashboard() {
         ))}
       </div>
 
-      <div className={styles.footerDiv}>
-        <p>&copy; Copyrights by Team 07</p>
-      </div>
+      <Footer />
     </div>
   );
 }

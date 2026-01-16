@@ -66,12 +66,24 @@ exports.getUnderService = async (req, res) => {
         ad.working_status,
 
         at.type_name,
-        lab.lab_name
+        lab.lab_name,
+
+        wd.warranty_id,
+        wd.warranty_startdate,
+        wd.warranty_enddate,
+
+        CASE
+          WHEN wd.warranty_id IS NOT NULL
+           AND CURDATE() BETWEEN wd.warranty_startdate AND wd.warranty_enddate
+          THEN 1
+          ELSE 0
+        END AS is_warranty_valid
 
       FROM service_requests sr
       JOIN asset_details ad ON sr.asset_id = ad.asset_id
       LEFT JOIN asset_types at ON ad.asset_type_id = at.type_id
       LEFT JOIN lab_details lab ON ad.lab_id = lab.lab_id
+      LEFT JOIN warranty_details wd ON ad.asset_id = wd.asset_id
 
       WHERE sr.service_status = 'sent'
       ORDER BY sr.sent_date DESC;
@@ -84,6 +96,7 @@ exports.getUnderService = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
 
 
 
